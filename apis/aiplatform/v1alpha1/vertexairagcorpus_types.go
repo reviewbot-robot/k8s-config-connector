@@ -15,6 +15,7 @@
 package v1alpha1
 
 import (
+	discoveryenginev1alpha1 "github.com/GoogleCloudPlatform/k8s-config-connector/apis/discoveryengine/v1alpha1"
 	refsv1beta1 "github.com/GoogleCloudPlatform/k8s-config-connector/apis/refs/v1beta1"
 	"github.com/GoogleCloudPlatform/k8s-config-connector/pkg/apis/k8s/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -66,6 +67,13 @@ type APIAuth_APIKeyConfig struct {
 	APIKeySecretVersionRef *refsv1beta1.SecretManagerSecretVersionRef `json:"apiKeySecretVersionRef,omitempty"`
 }
 
+// +kcc:proto=google.cloud.aiplatform.v1.VertexAiSearchConfig
+type VertexAiSearchConfig struct {
+	// Vertex AI Search Serving Config resource.
+	// +kcc:proto:field=google.cloud.aiplatform.v1.VertexAiSearchConfig.serving_config
+	ServingConfigRef *discoveryenginev1alpha1.DiscoveryEngineServingConfigRef `json:"servingConfigRef,omitempty"`
+}
+
 // +kcc:proto=google.cloud.aiplatform.v1.RagEmbeddingModelConfig.VertexPredictionEndpoint
 type RagEmbeddingModelConfig_VertexPredictionEndpoint struct {
 	// Required. The endpoint resource name.
@@ -77,7 +85,7 @@ type RagEmbeddingModelConfig_VertexPredictionEndpoint struct {
 type RagEmbeddingModelConfig_VertexPredictionEndpointObservedState struct {
 	// Required. The endpoint resource name.
 	// +kcc:proto:field=google.cloud.aiplatform.v1.RagEmbeddingModelConfig.VertexPredictionEndpoint.endpoint
-	EndpointRef *VertexAIEndpointRef `json:"endpointRef,omitempty"`
+	Endpoint *string `json:"endpoint,omitempty"`
 }
 
 // +kcc:proto=google.cloud.aiplatform.v1.RagVectorDbConfig.VertexVectorSearch
@@ -133,7 +141,7 @@ type VertexAIRagCorpusObservedState struct {
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +kubebuilder:resource:categories=gcp,shortName=gcpvertexairagcorpus;gcpvertexairagcorpuss
+// +kubebuilder:resource:categories=gcp,shortName=gcpvertexairagcorpus;gcpvertexairagcorpora
 // +kubebuilder:subresource:status
 // +kubebuilder:metadata:labels="cnrm.cloud.google.com/managed-by-kcc=true"
 // +kubebuilder:metadata:labels="cnrm.cloud.google.com/system=true"

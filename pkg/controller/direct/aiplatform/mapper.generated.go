@@ -31,6 +31,7 @@ import (
 	krmcomputerefs "github.com/GoogleCloudPlatform/k8s-config-connector/apis/compute/refs"
 	krmcomputev1alpha1 "github.com/GoogleCloudPlatform/k8s-config-connector/apis/compute/v1alpha1"
 	krmcomputev1beta1 "github.com/GoogleCloudPlatform/k8s-config-connector/apis/compute/v1beta1"
+	krmdiscoveryenginev1alpha1 "github.com/GoogleCloudPlatform/k8s-config-connector/apis/discoveryengine/v1alpha1"
 	refsv1beta1 "github.com/GoogleCloudPlatform/k8s-config-connector/apis/refs/v1beta1"
 	"github.com/GoogleCloudPlatform/k8s-config-connector/pkg/controller/direct"
 )
@@ -2295,9 +2296,7 @@ func RagEmbeddingModelConfig_VertexPredictionEndpointObservedState_FromProto(map
 		return nil
 	}
 	out := &krm.RagEmbeddingModelConfig_VertexPredictionEndpointObservedState{}
-	if in.GetEndpoint() != "" {
-		out.EndpointRef = &krm.VertexAIEndpointRef{External: in.GetEndpoint()}
-	}
+	out.Endpoint = direct.LazyPtr(in.GetEndpoint())
 	// MISSING: Model
 	// MISSING: ModelVersionID
 	return out
@@ -2307,9 +2306,7 @@ func RagEmbeddingModelConfig_VertexPredictionEndpointObservedState_ToProto(mapCt
 		return nil
 	}
 	out := &pb.RagEmbeddingModelConfig_VertexPredictionEndpoint{}
-	if in.EndpointRef != nil {
-		out.Endpoint = in.EndpointRef.External
-	}
+	out.Endpoint = direct.ValueOf(in.Endpoint)
 	// MISSING: Model
 	// MISSING: ModelVersionID
 	return out
@@ -3932,7 +3929,9 @@ func VertexAiSearchConfig_FromProto(mapCtx *direct.MapContext, in *pb.VertexAiSe
 		return nil
 	}
 	out := &krm.VertexAiSearchConfig{}
-	out.ServingConfig = direct.LazyPtr(in.GetServingConfig())
+	if in.GetServingConfig() != "" {
+		out.ServingConfigRef = &krmdiscoveryenginev1alpha1.DiscoveryEngineServingConfigRef{External: in.GetServingConfig()}
+	}
 	return out
 }
 func VertexAiSearchConfig_ToProto(mapCtx *direct.MapContext, in *krm.VertexAiSearchConfig) *pb.VertexAiSearchConfig {
@@ -3940,7 +3939,9 @@ func VertexAiSearchConfig_ToProto(mapCtx *direct.MapContext, in *krm.VertexAiSea
 		return nil
 	}
 	out := &pb.VertexAiSearchConfig{}
-	out.ServingConfig = direct.ValueOf(in.ServingConfig)
+	if in.ServingConfigRef != nil {
+		out.ServingConfig = in.ServingConfigRef.External
+	}
 	return out
 }
 func VideoMetadata_FromProto(mapCtx *direct.MapContext, in *pb.VideoMetadata) *krm.VideoMetadata {

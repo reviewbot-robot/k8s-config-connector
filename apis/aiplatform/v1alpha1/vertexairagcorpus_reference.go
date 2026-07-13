@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/GoogleCloudPlatform/k8s-config-connector/apis/common"
 	"github.com/GoogleCloudPlatform/k8s-config-connector/apis/common/identity"
 	refs "github.com/GoogleCloudPlatform/k8s-config-connector/apis/refs/v1beta1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -87,18 +86,7 @@ func (r *VertexAIRagCorpusRef) ParseExternalToIdentity() (identity.Identity, err
 }
 
 func (r *VertexAIRagCorpusRef) Normalize(ctx context.Context, reader client.Reader, defaultNamespace string) error {
-	fallback := func(u *unstructured.Unstructured) string {
-		structuredObj, err := common.ToStructuredType[*VertexAIRagCorpus](u)
-		if err != nil {
-			return ""
-		}
-		identity, err := getIdentityFromVertexAIRagCorpusSpec(ctx, reader, structuredObj)
-		if err != nil {
-			return ""
-		}
-		return identity.String()
-	}
-	return refs.NormalizeWithFallback(ctx, reader, r, defaultNamespace, fallback)
+	return refs.Normalize(ctx, reader, r, defaultNamespace)
 }
 
 // VertexAIIndexEndpointRef is a reference to a GCP VertexAIIndexEndpoint.
@@ -146,19 +134,8 @@ func (r *VertexAIIndexEndpointRef) ValidateExternal(ref string) error {
 
 func (r *VertexAIIndexEndpointRef) Normalize(ctx context.Context, reader client.Reader, defaultNamespace string) error {
 	fallback := func(u *unstructured.Unstructured) string {
-		resourceID, err := refs.GetResourceID(u)
-		if err != nil {
-			return ""
-		}
-		projectID, err := refs.ResolveProjectID(ctx, reader, u)
-		if err != nil {
-			return ""
-		}
-		region, _, _ := unstructured.NestedString(u.Object, "spec", "region")
-		if region == "" {
-			return ""
-		}
-		return fmt.Sprintf("projects/%s/locations/%s/indexEndpoints/%s", projectID, region, resourceID)
+		name, _, _ := unstructured.NestedString(u.Object, "status", "name")
+		return name
 	}
 	return refs.NormalizeWithFallback(ctx, reader, r, defaultNamespace, fallback)
 }
@@ -208,19 +185,11 @@ func (r *VertexAIIndexRef) ValidateExternal(ref string) error {
 
 func (r *VertexAIIndexRef) Normalize(ctx context.Context, reader client.Reader, defaultNamespace string) error {
 	fallback := func(u *unstructured.Unstructured) string {
-		resourceID, err := refs.GetResourceID(u)
-		if err != nil {
-			return ""
+		name, _, _ := unstructured.NestedString(u.Object, "status", "observedState", "name")
+		if name == "" {
+			name, _, _ = unstructured.NestedString(u.Object, "status", "name")
 		}
-		projectID, err := refs.ResolveProjectID(ctx, reader, u)
-		if err != nil {
-			return ""
-		}
-		region, _, _ := unstructured.NestedString(u.Object, "spec", "region")
-		if region == "" {
-			return ""
-		}
-		return fmt.Sprintf("projects/%s/locations/%s/indexes/%s", projectID, region, resourceID)
+		return name
 	}
 	return refs.NormalizeWithFallback(ctx, reader, r, defaultNamespace, fallback)
 }
@@ -270,6 +239,24 @@ func (r *VertexAIEndpointRef) ValidateExternal(ref string) error {
 
 func (r *VertexAIEndpointRef) Normalize(ctx context.Context, reader client.Reader, defaultNamespace string) error {
 	fallback := func(u *unstructured.Unstructured) string {
+		ready := false
+		conditions, found, err := unstructured.NestedSlice(u.Object, "status", "conditions")
+		if err == nil && found {
+			for _, c := range conditions {
+				condition, ok := c.(map[string]interface{})
+				if !ok {
+					continue
+				}
+				if condition["type"] == "Ready" && condition["status"] == "True" {
+					ready = true
+					break
+				}
+			}
+		}
+		if !ready {
+			return ""
+		}
+
 		resourceID, err := refs.GetResourceID(u)
 		if err != nil {
 			return ""
