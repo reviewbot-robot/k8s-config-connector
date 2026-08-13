@@ -15,6 +15,7 @@
 package v1alpha1
 
 import (
+	dlpv1alpha1 "github.com/GoogleCloudPlatform/k8s-config-connector/apis/dlp/v1alpha1"
 	refsv1beta1 "github.com/GoogleCloudPlatform/k8s-config-connector/apis/refs/v1beta1"
 	"github.com/GoogleCloudPlatform/k8s-config-connector/pkg/apis/k8s/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -80,7 +81,7 @@ type VertexAISecurityPolicyObservedState struct {
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +kubebuilder:resource:categories=gcp,shortName=gcpvertexaisecuritypolicy;gcpvertexaisecuritypolicys
+// +kubebuilder:resource:categories=gcp,shortName=gcpvertexaisecuritypolicy;gcpvertexaisecuritypolicies
 // +kubebuilder:subresource:status
 // +kubebuilder:metadata:labels="cnrm.cloud.google.com/managed-by-kcc=true"
 // +kubebuilder:metadata:labels="cnrm.cloud.google.com/system=true"
@@ -107,6 +108,16 @@ type VertexAISecurityPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []VertexAISecurityPolicy `json:"items"`
+}
+
+// SdpAdvancedConfig defines SDP advanced config
+// +kcc:proto=google.cloud.modelarmor.v1.SdpAdvancedConfig
+type SdpAdvancedConfig struct {
+	// Optional. deidentify_template.
+	DeidentifyTemplateRef *dlpv1alpha1.DLPDeidentifyTemplateRef `json:"deidentifyTemplateRef,omitempty"`
+
+	// Optional. inspect_template.
+	InspectTemplateRef *dlpv1alpha1.DLPInspectTemplateRef `json:"inspectTemplateRef,omitempty"`
 }
 
 func init() {
