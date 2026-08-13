@@ -17,6 +17,7 @@ package v1alpha1
 import (
 	refsv1beta1 "github.com/GoogleCloudPlatform/k8s-config-connector/apis/refs/v1beta1"
 	"github.com/GoogleCloudPlatform/k8s-config-connector/pkg/apis/k8s/v1alpha1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -31,7 +32,7 @@ type VertexAIModelSpec struct {
 
 	// The location of this resource.
 	// +required
-	Location string `json:"location"`
+	Location *string `json:"location"`
 
 	// The VertexAIModel name. If not given, the metadata.name will be used.
 	ResourceID *string `json:"resourceID,omitempty"`
@@ -53,7 +54,7 @@ type VertexAIModelSpec struct {
 	//  characters.
 	// +kcc:proto:field=google.cloud.aiplatform.v1beta1.Model.display_name
 	// +required
-	DisplayName string `json:"displayName"`
+	DisplayName *string `json:"displayName"`
 
 	// The description of the Model.
 	// +kcc:proto:field=google.cloud.aiplatform.v1beta1.Model.description
@@ -398,4 +399,39 @@ type VertexAIModelList struct {
 
 func init() {
 	SchemeBuilder.Register(&VertexAIModel{}, &VertexAIModelList{})
+}
+
+// +kcc:proto=google.protobuf.ListValue
+type ListValue struct {
+	// Repeated field of dynamically typed values.
+	// +kcc:proto:field=google.protobuf.ListValue.values
+	// +kubebuilder:validation:items:Type=object
+	Values []Value `json:"values,omitempty"`
+}
+
+// +kcc:proto=google.protobuf.Value
+type Value struct {
+	// Represents a null value.
+	// +kcc:proto:field=google.protobuf.Value.null_value
+	NullValue *string `json:"nullValue,omitempty"`
+
+	// Represents a double value.
+	// +kcc:proto:field=google.protobuf.Value.number_value
+	NumberValue *float64 `json:"numberValue,omitempty"`
+
+	// Represents a string value.
+	// +kcc:proto:field=google.protobuf.Value.string_value
+	StringValue *string `json:"stringValue,omitempty"`
+
+	// Represents a boolean value.
+	// +kcc:proto:field=google.protobuf.Value.bool_value
+	BoolValue *bool `json:"boolValue,omitempty"`
+
+	// Represents a structured value.
+	// +kcc:proto:field=google.protobuf.Value.struct_value
+	StructValue apiextensionsv1.JSON `json:"structValue,omitempty"`
+
+	// Represents a repeated `Value`.
+	// +kcc:proto:field=google.protobuf.Value.list_value
+	ListValue *ListValue `json:"-"`
 }

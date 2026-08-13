@@ -3607,6 +3607,11 @@ func (in *VertexAIModelSpec) DeepCopyInto(out *VertexAIModelSpec) {
 		*out = new(v1beta1.ProjectRef)
 		**out = **in
 	}
+	if in.Location != nil {
+		in, out := &in.Location, &out.Location
+		*out = new(string)
+		**out = **in
+	}
 	if in.ResourceID != nil {
 		in, out := &in.ResourceID, &out.ResourceID
 		*out = new(string)
@@ -3616,6 +3621,11 @@ func (in *VertexAIModelSpec) DeepCopyInto(out *VertexAIModelSpec) {
 		in, out := &in.VersionAliases, &out.VersionAliases
 		*out = make([]string, len(*in))
 		copy(*out, *in)
+	}
+	if in.DisplayName != nil {
+		in, out := &in.DisplayName, &out.DisplayName
+		*out = new(string)
+		**out = **in
 	}
 	if in.Description != nil {
 		in, out := &in.Description, &out.Description

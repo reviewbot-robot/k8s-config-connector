@@ -1898,7 +1898,7 @@ func VertexAIModelSpec_v1alpha1_FromProto(mapCtx *direct.MapContext, in *pb.Mode
 	out := &krmvertexaiv1alpha1.VertexAIModelSpec{}
 	// MISSING: Name
 	out.VersionAliases = in.VersionAliases
-	out.DisplayName = in.GetDisplayName()
+	out.DisplayName = direct.LazyPtr(in.GetDisplayName())
 	out.Description = direct.LazyPtr(in.GetDescription())
 	out.VersionDescription = direct.LazyPtr(in.GetVersionDescription())
 	out.DefaultCheckpointID = direct.LazyPtr(in.GetDefaultCheckpointId())
@@ -1921,7 +1921,7 @@ func VertexAIModelSpec_v1alpha1_ToProto(mapCtx *direct.MapContext, in *krmvertex
 	out := &pb.Model{}
 	// MISSING: Name
 	out.VersionAliases = in.VersionAliases
-	out.DisplayName = VertexAIModelSpec_DisplayName_ToProto(mapCtx, in.DisplayName)
+	out.DisplayName = direct.ValueOf(in.DisplayName)
 	out.Description = direct.ValueOf(in.Description)
 	out.VersionDescription = direct.ValueOf(in.VersionDescription)
 	out.DefaultCheckpointId = direct.ValueOf(in.DefaultCheckpointID)
