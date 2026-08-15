@@ -17,9 +17,7 @@ package v1alpha1
 import (
 	"context"
 
-	"github.com/GoogleCloudPlatform/k8s-config-connector/apis/common"
 	refs "github.com/GoogleCloudPlatform/k8s-config-connector/apis/refs/v1beta1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -74,15 +72,5 @@ func (r *APIHubAPIRef) ParseExternalToIdentity() (any, error) {
 }
 
 func (r *APIHubAPIRef) Normalize(ctx context.Context, reader client.Reader, defaultNamespace string) error {
-	return refs.NormalizeWithFallback(ctx, reader, r, defaultNamespace, func(u *unstructured.Unstructured) string {
-		obj, err := common.ToStructuredType[*APIHubAPI](u)
-		if err != nil {
-			return ""
-		}
-		id, err := getIdentityFromAPIHubAPISpec(ctx, reader, obj)
-		if err != nil {
-			return ""
-		}
-		return id.String()
-	})
+	return refs.Normalize(ctx, reader, r, defaultNamespace)
 }
