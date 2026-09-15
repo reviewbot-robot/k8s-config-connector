@@ -59,11 +59,6 @@ ${CONTROLLERBUILDER} generate-mapper \
   --service google.cloud.numberregistry.v1alpha \
   --api-version cloudnumberregistry.cnrm.cloud.google.com/v1alpha1
 
-${CONTROLLERBUILDER} generate-mapper \
-  --proto-source-path "${REPO_ROOT}/.build/googleapis-numberregistry.pb" \
-  --service google.cloud.numberregistry.v1alpha \
-  --api-version cloudnumberregistry.cnrm.cloud.google.com/v1alpha1
-
 cd ${REPO_ROOT}
 dev/tasks/generate-crds
 
